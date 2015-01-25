@@ -12,17 +12,16 @@ local counter = {}
 local kazan1,kazan2
 local texts = {}
 local counterTexts = {}
-local tuzdyks = {}
+local kazan1collected,kazan2collected
 
 local totalStones = {}
 local gameOver = false
-local tuzdyk1 = 0
-local tuzdyk2 = 0
+local tuzdyks = {0,0}
 
 local player1Name 
 local player2Name
 
-local p1turn = true
+local p1turn = false
 local startingPlayer = 0
 
 --- 720 x 1280
@@ -52,16 +51,17 @@ local soundPlaying = false
 
 ---------------------------------------------------
 moveToKazan = function()
-    local stonesToSteal = tonumber(#LK[lastLunka])
+    local stonesToSteal = tonumber(counterTexts[lastLunka].text)
     local tekStone
     local kazanX, kazanY, rowY, rowX, kazanPos
     local stonesInKazan
     local shifted = false
     local modX = 0
-
+    -- print("kazan last lunka "..lastLunka)
+    -- print("trying to steal to kazan "..stonesToSteal)
     rowY = 0
     if stonesToSteal>0 then
-        print("still stealing, now we have to steal "..stonesToSteal.." more stones from lunka "..lastLunka)
+        -- print("still stealing, now we have to steal "..stonesToSteal.." more stones from lunka "..lastLunka)
         moveCompleted = false
         if startingPlayer==1 then 
             kazanY = display.contentCenterY - 80
@@ -80,12 +80,12 @@ moveToKazan = function()
             rowX = (stonesInKazan-60)*33
             rowY = -60
             modX = modX - 120
-            print(modX.." is modX after 60")
+            --print(modX.." is modX after 60")
         elseif stonesInKazan>29 then
             rowX = (stonesInKazan-30)*33
             rowY = -30
             modX = modX - 60
-            print(modX.." is modX after 30")
+            --print(modX.." is modX after 30")
         else
             rowX = stonesInKazan*33
         end
@@ -94,9 +94,16 @@ moveToKazan = function()
         end
         kazanX = rowX + kazanX + modX
         kazanY = kazanY - rowY
+        for k, v in pairs( LK[lastLunka] ) do
+                -- print("last lunka has: "..k, v)
+        end
         tekStone = LK[lastLunka][#LK[lastLunka]]
         table.remove(LK[lastLunka])
-        print("removing stone #"..tekStone)
+        -- if tekStone==nil then
+        --     print("nil stone")
+        -- else
+        --     print("removing stone #"..tekStone)
+        -- end
         transition.to(stones[tekStone],{time=1000,x=kazanX,y=kazanY})
         counterTexts[lastLunka].text = stonesToSteal - 1
         if startingPlayer==1 then
@@ -109,6 +116,7 @@ moveToKazan = function()
         timer.performWithDelay(100,moveToKazan)
     else
         moveCompleted = true
+        return true
     end
 end
 ----------------------------------------------------
@@ -130,7 +138,7 @@ moveShar = function(origin,dest,sharId)
 			pos = #LK[dest]+1
 
 			LK[dest][pos] = sharId
-			print("inserting into "..dest.." to pos "..pos.." shar "..sharId)
+			--print("inserting into "..dest.." to pos "..pos.." shar "..sharId)
 			xx=dest
 			if dest>9 then 
 				xx=9-(18-dest)
@@ -201,7 +209,7 @@ local function goBack(event)
             thisGroup[i]:setFillColor(100/255,100/255,100/255)
         end
     end
-    print("pausing")
+    --print("pausing")
     local options = {
         effect = "slideDown",
         time = 500,
@@ -235,26 +243,79 @@ local function soundFinished(event)
     end-- OK
 end
 
+
 local function moveBalls()
     local num,lastPlayer
     local stealStones = false
-	
+	-----------
+    -- if tuzdyks[1]~=0 then
+    --         startingPlayer=1
+    --         lastLunka=tuzdyks[1]
+    --         print("collecting tuzdyk1="..tuzdyks[1])
+    --         timer.performWithDelay(100,moveToKazan)
+    --     end
+    --     if tuzdyks[2]~=0 then
+    --         startingPlayer=2
+    --         lastLunka=tuzdyks[2]
+    --         print("collecting tuzdyk2="..tuzdyks[2])
+    --         timer.performWithDelay(100,moveToKazan)
+    --     end
+    ------------
     if countMoves>=currentStones-1 then
 		countMoves = 0
-		moveCompleted = true
+		
         lastLunka = nextLunka
         if lastLunka<10 then
             lastPlayer = 1
         else 
             lastPlayer = 2
         end
-        num = counterTexts[lastLunka].text
-        if (num % 2==0)and(startingPlayer~=lastPlayer) then 
-            print("Stealing stones") 
+        num = tonumber(counterTexts[lastLunka].text)
+        -- print("num = "..num)
+        if (num % 2==0) and (startingPlayer~=lastPlayer) then 
+            --print("Stealing stones") 
             for k, v in pairs( LK[lastLunka] ) do
-                print("last lunka has: "..k, v)
+                --print("last lunka has: "..k, v)
             end
             moveToKazan()
+        end
+        -- print("startingPlayer "..startingPlayer)
+        -- print("last player "..lastPlayer)
+        if (num == 3) and (startingPlayer ~= lastPlayer) then
+            -- tuzdyk
+            print("tuzdyk")
+            if tuzdyks[startingPlayer]==0 then
+                print("tuzdyk for player "..startingPlayer.." at lunka #"..lastLunka)
+                tuzdyks[startingPlayer] = lastLunka
+                thisGroup:remove(lunkas[lastLunka])
+                lunkas[lastLunka] = display.newImage("images/tuzdyk.png")
+                if startingPlayer==2 then
+                    lunkas[lastLunka].rotation = 90
+                    lunkas[lastLunka].x = lunkaLeft+lunkaSpace*(10-lastLunka)
+                    lunkas[lastLunka].y = lunkaTop
+                    lunkas[lastLunka].id = lastLunka
+                else
+                    lunkas[lastLunka].rotation = -90
+                    lunkas[lastLunka].x = lunkaLeft+lunkaSpace*(lastLunka-9)
+                    lunkas[lastLunka].y = display.contentHeight - lunkaTop
+                    lunkas[lastLunka].id = lastLunka
+                end
+                thisGroup:insert(lastLunka,lunkas[lastLunka])
+                --moveToKazan()
+            end
+        end
+        if not kazan1collected then
+            if tuzdyks[1]~=0 then
+                startingPlayer=1
+                lastLunka=tuzdyks[1]
+                print("collecting tuzdyk1="..tuzdyks[1])
+                timer.performWithDelay(100,moveToKazan)
+            end
+            kazan1collected = true
+        end
+        if not kazan2collected then
+            kazan2collected
+            moveCompleted = true
         end
 	else
 		countMoves = countMoves + 1
@@ -281,19 +342,32 @@ local function makeMove()
 end
 
 local function lunkaSelect(event)
-	if moveCompleted then
-        if counter[event.target.id]~=0 then
-            selectedLunka = event.target.id
-            previousLunka = selectedLunka
-            if selectedLunka<10 then
-                startingPlayer=1
-            else
-                startingPlayer=2
+    local notp1turn = false
+    local lunkaId = event.target.id
+
+    print("lunkaId = "..lunkaId)
+    if lunkaId<10 then 
+        notp1turn=false 
+    else
+        notp1turn=true
+    end
+
+    --if not p1turn == notp1turn then
+    	if moveCompleted then
+            if counter[event.target.id]~=0 then
+                p1turn = not p1turn
+                selectedLunka = event.target.id
+                previousLunka = selectedLunka
+                if selectedLunka<10 then
+                    startingPlayer=1
+                else
+                    startingPlayer=2
+                end
+    			makeMove()
+                previousLunka = 0
             end
-			makeMove()
-            previousLunka = 0
-        end
-	end
+    	end
+    --end
 end
 
 local function initBoard (sceneGroup)
@@ -368,12 +442,12 @@ local function initBoard (sceneGroup)
     end
     counter.player1 = 0
     counter.player2 = 0
-    player2Name = display.newText(sceneGroup,"Talgat",10,50,native.systemFontBold,25)
+    player2Name = display.newText(sceneGroup,"Player 2",10,50,native.systemFontBold,25)
     player2Name.x = 90
     player2Name.y = 150
     player2Name.rotation = -90
 
-    player1Name = display.newText(sceneGroup,"Timur",10,50,native.systemFontBold,25)
+    player1Name = display.newText(sceneGroup,"Player 1",10,50,native.systemFontBold,25)
     player1Name.x = 90
     player1Name.y = display.contentHeight - 150
     player1Name.rotation = -90
@@ -408,10 +482,10 @@ end
 
 function scene:resumeGame()
     local total = thisGroup.numChildren
-        print("about to show!")
+        --print("about to show!")
         for i = 1, total do
             if thisGroup[i]~=nil then 
-                print("i'm here"..i)
+                --print("i'm here"..i)
                 thisGroup[i]:setFillColor(1,1,1)
             end
         end
