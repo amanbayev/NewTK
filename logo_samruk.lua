@@ -3,24 +3,31 @@ local composer = require( "composer" )
 local scene = composer.newScene()
 
 local menuBackground
-local button1, button2
+local started = false
 
 local function startGame(event)
-	composer.gotoScene("board")
+    
+	if not started then
+        started = true
+        composer.gotoScene("menu")
+    end
 end
 
 function scene:create( event )
 
     local sceneGroup = self.view
+    local ratio
 
-    menuBackground = display.newImage("images/menu_bg.png")
+    menuBackground = display.newImage("images/logo_samruk.png")
     menuBackground.x = display.contentCenterX
-    menuBackground.y = display.contentCenterY
-    menuBackground.width = display.contentWidth
-    menuBackground.height = display.contentHeight
+    menuBackground.y = display.contentCenterY+150
+    menuBackground.xScale = 1.3
+    menuBackground.yScale = 1.3
     sceneGroup:insert(menuBackground)
     menuBackground:addEventListener("tap",startGame)
-    
+    if not started then 
+        timer.performWithDelay(2000,startGame)
+    end
 end
 
 

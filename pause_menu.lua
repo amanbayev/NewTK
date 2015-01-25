@@ -6,21 +6,46 @@ local menuBackground
 local button1, button2
 
 local function startGame(event)
-	composer.gotoScene("board")
+	composer.hideOverlay("slideUp",400)
+
+end
+
+local function returnToMenu(event)
+    
+    local options = 
+    {
+        effect = "fade",
+        time = 600
+    }
+    composer.gotoScene("menu",options)
+    composer.hideOverlay()
 end
 
 function scene:create( event )
 
     local sceneGroup = self.view
+    local ratio
 
-    menuBackground = display.newImage("images/menu_bg.png")
+    menuBackground = display.newImage("images/pause_menu.png")
     menuBackground.x = display.contentCenterX
     menuBackground.y = display.contentCenterY
-    menuBackground.width = display.contentWidth
-    menuBackground.height = display.contentHeight
-    sceneGroup:insert(menuBackground)
-    menuBackground:addEventListener("tap",startGame)
     
+    sceneGroup:insert(menuBackground)
+
+    button1 = display.newImage("images/menu_button.png")
+    button1.x = display.contentCenterX -150
+    button1.y = display.contentCenterY + 150
+    sceneGroup:insert(button1)
+    button1:addEventListener("tap",returnToMenu)
+
+    button2 = display.newImage("images/resume_button.png")
+    button2.x = display.contentCenterX + 150
+    button2.y = display.contentCenterY + 152
+    sceneGroup:insert(button2)
+    button2:addEventListener("tap",startGame)
+
+    --menuBackground:addEventListener("tap",startGame)
+    --timer.performWithDelay(2000,startGame)
 end
 
 
@@ -31,6 +56,7 @@ function scene:show( event )
     local phase = event.phase
 
     if ( phase == "will" ) then
+        
         -- Called when the scene is still off screen (but is about to come on screen).
     elseif ( phase == "did" ) then
         -- Called when the scene is now on screen.
@@ -47,6 +73,7 @@ function scene:hide( event )
     local phase = event.phase
 
     if ( phase == "will" ) then
+            event.parent:resumeGame()
         -- Called when the scene is on screen (but is about to go off screen).
         -- Insert code here to "pause" the scene.
         -- Example: stop timers, stop animation, stop audio, etc.

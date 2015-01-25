@@ -2,7 +2,10 @@ local composer = require( "composer" )
 
 local scene = composer.newScene()
 
+local thisGroup
+
 local board
+local playPause
 local lunkas = {}
 local stones = {}
 local counter = {}
@@ -67,24 +70,24 @@ moveToKazan = function()
             kazanY = display.contentCenterY + 80
             stonesInKazan = counter.player2
         end
-        kazanX = 175
+        kazanX = 170
         local myNumber = stonesInKazan / 10
         local integralPart, fractionalPart = math.modf( myNumber )
         
-        modX = integralPart * 10
+        modX = integralPart * 20
         --print("mod 10 is "..modX)
         if stonesInKazan>59 then
-            rowX = (stonesInKazan-60)*30
+            rowX = (stonesInKazan-60)*33
             rowY = -60
-            modX = modX - 60
+            modX = modX - 120
             print(modX.." is modX after 60")
         elseif stonesInKazan>29 then
-            rowX = (stonesInKazan-30)*30
+            rowX = (stonesInKazan-30)*33
             rowY = -30
-            modX = modX - 30
+            modX = modX - 60
             print(modX.." is modX after 30")
         else
-            rowX = stonesInKazan*30
+            rowX = stonesInKazan*33
         end
         if startingPlayer==2 then
             rowY = -rowY
@@ -191,6 +194,22 @@ local function onKeyEvent(event)
     return false -- OK
 end
 
+local function goBack(event)
+    local total = thisGroup.numChildren
+    for i = 1, total do
+        if thisGroup[i]~=nil then 
+            thisGroup[i]:setFillColor(100/255,100/255,100/255)
+        end
+    end
+    print("pausing")
+    local options = {
+        effect = "slideDown",
+        time = 500,
+        isModal = true
+    }
+    composer.showOverlay("pause_menu",options)
+end
+
 local function initShars()
 	local integralPart, fractionalPart = math.modf( sharId / 9 )
 	selectedLunka = integralPart+1
@@ -244,12 +263,6 @@ local function moveBalls()
             nextLunka = 1 
         end
 		moveShar(selectedLunka,nextLunka,LK[selectedLunka][#LK[selectedLunka]])
-		
-  --       counter[selectedLunka]=counter[selectedLunka] - 1
-		-- counterTexts[selectedLunka].text = counter[selectedLunka]
-		-- counter[nextLunka]=counter[nextLunka] + 1
-		-- counterTexts[nextLunka].text = counter[nextLunka]
-		
         timer.performWithDelay(50,moveBalls)
 	end
 end
@@ -284,9 +297,11 @@ local function lunkaSelect(event)
 end
 
 local function initBoard (sceneGroup)
-	board = display.newImage("images/board_bg.png")
+	board = display.newImage("images/board_wide.png")
     board.x = display.contentCenterX
     board.y = display.contentCenterY
+    -- board.width = display.contentHeight
+    -- board.height = display.contentWidth
     board.rotation = -90
     sceneGroup:insert(board)
 
@@ -371,6 +386,14 @@ local function initBoard (sceneGroup)
     counterTexts.player2.x = 90
     counterTexts.player2.y = display.contentCenterY + 50
     counterTexts.player2.rotation = -90
+
+    playPause = display.newImage("images/play_pause.png")
+    playPause.rotation = -90
+    playPause.x = 32
+    playPause.y = display.contentHeight / 2
+    sceneGroup:insert(playPause)
+    playPause:addEventListener("tap",goBack)
+    thisGroup = sceneGroup
 end
 
 ----------------------------------------------------------------------------------
@@ -382,12 +405,25 @@ function scene:create( event )
     Runtime:addEventListener( "key", onKeyEvent )
 end
 -- "scene:show()"
+
+function scene:resumeGame()
+    local total = thisGroup.numChildren
+        print("about to show!")
+        for i = 1, total do
+            if thisGroup[i]~=nil then 
+                print("i'm here"..i)
+                thisGroup[i]:setFillColor(1,1,1)
+            end
+        end
+end
+
 function scene:show( event )
 
     local sceneGroup = self.view
     local phase = event.phase
 
     if ( phase == "will" ) then
+        
         -- Called when the scene is still off screen (but is about to come on screen).
     elseif ( phase == "did" ) then
         -- Called when the scene is now on screen.
