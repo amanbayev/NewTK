@@ -6,6 +6,12 @@ local menuBackground
 local button1, button2
 
 local function startGame(event)
+    composer.player1Name = "Талгат"
+    composer.player2Name = "Естай"
+    composer.lang = "ru"
+    composer.yourTurn = " ваш ход!"
+    composer.collectingTuzdykText = "Собираем туздык"
+    composer.moveInProgress = "Идет ход..."
 	composer.gotoScene("board")
 end
 
