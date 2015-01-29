@@ -1,59 +1,52 @@
 local composer = require( "composer" )
 
 local scene = composer.newScene()
-
+local winCondition = composer.winCondition
+local winner = composer.winner
 local menuBackground
-local player1Name = composer.player1Name or "Player 1"
-local player2Name = composer.player2Name or "Player 2"
-local lang = composer.lang or "kz"
-local multiplayer,achievements,leaderboards,gpgs
+local button1, button2
 
 local function startGame(event)
-    -- composer.player1Name = "Талгат"
-    -- composer.player2Name = "Естай"
-    composer.player2Name = player2Name
-    composer.player1Name = player1Name
-    if lang=="ru" then
-        composer.yourTurn = " ваш ход!"
-        composer.collectingTuzdykText = "Собираем туздык"
-        composer.moveInProgress = "Идет ход..."
-        composer.textForPause = "Игра на паузе"
-        composer.menuText = "Меню"
-        composer.resumeText = "Продолжить"    
-    elseif lang=="en" then
-        composer.yourTurn = " your turn!"
-        composer.collectingTuzdykText = "Collecting tuzdyk"
-        composer.moveInProgress = "Move in progress..."
-        composer.textForPause = "Game is paused"
-        composer.menuText = "Menu"
-        composer.resumeText = "Resume"
-    elseif lang=="kz" then
-        composer.yourTurn = " сен жүресін!"
-        composer.collectingTuzdykText = "Тұздықтан құмалақ алуда"
-        composer.moveInProgress = "Жүріс..."
-        composer.textForPause = "Ойын паузаға қойылды"
-        composer.menuText = "Меню"
-        composer.resumeText = "Жалғастыру"
-    end
-    composer.gotoScene("board")
+	composer.hideOverlay("slideUp",400)
+
+end
+
+local function returnToMenu(event)
+    
+    local options = 
+    {
+        effect = "fade",
+        time = 600
+    }
+    composer.gotoScene("menu",options)
+    composer.hideOverlay()
 end
 
 function scene:create( event )
 
     local sceneGroup = self.view
+    local ratio
 
-    menuBackground = display.newImage("images/menu_bg.png")
+    menuBackground = display.newImage("images/pause_menu.png")
     menuBackground.x = display.contentCenterX
     menuBackground.y = display.contentCenterY
-    menuBackground.width = display.contentWidth
-    menuBackground.height = display.contentHeight
+    
     sceneGroup:insert(menuBackground)
-    menuBackground:addEventListener("tap",startGame)
-   
-    gpgs = display.newImage("images/gpgs.png") 
-    gpgs.x = 1100
-    gpgs.y = 500
-    sceneGroup:insert(gpgs)
+
+    button1 = display.newImage("images/menu_button.png")
+    button1.x = display.contentCenterX -150
+    button1.y = display.contentCenterY + 150
+    sceneGroup:insert(button1)
+    button1:addEventListener("tap",returnToMenu)
+
+    button2 = display.newImage("images/resume_button.png")
+    button2.x = display.contentCenterX + 150
+    button2.y = display.contentCenterY + 152
+    sceneGroup:insert(button2)
+    button2:addEventListener("tap",startGame)
+
+    --menuBackground:addEventListener("tap",startGame)
+    --timer.performWithDelay(2000,startGame)
 end
 
 
@@ -64,6 +57,7 @@ function scene:show( event )
     local phase = event.phase
 
     if ( phase == "will" ) then
+        
         -- Called when the scene is still off screen (but is about to come on screen).
     elseif ( phase == "did" ) then
         -- Called when the scene is now on screen.
@@ -80,6 +74,7 @@ function scene:hide( event )
     local phase = event.phase
 
     if ( phase == "will" ) then
+            event.parent:resumeGame()
         -- Called when the scene is on screen (but is about to go off screen).
         -- Insert code here to "pause" the scene.
         -- Example: stop timers, stop animation, stop audio, etc.

@@ -4,6 +4,9 @@ local scene = composer.newScene()
 
 local menuBackground
 local button1, button2
+local textForPause = composer.textForPause
+local menuText = composer.menuText
+local resumeText = composer.resumeText
 
 local function startGame(event)
 	composer.hideOverlay("slideUp",400)
@@ -25,21 +28,28 @@ function scene:create( event )
 
     local sceneGroup = self.view
     local ratio
+    local pauseText
 
-    menuBackground = display.newImage("images/pause_menu.png")
+    menuBackground = display.newImage("images/pause_menu_universal.png")
     menuBackground.x = display.contentCenterX
     menuBackground.y = display.contentCenterY
     
     sceneGroup:insert(menuBackground)
 
-    button1 = display.newImage("images/menu_button.png")
+    pauseText = display.newText(sceneGroup,textForPause,0,0,native.systemFontBold,40)
+    pauseText.x = display.contentCenterX
+    pauseText.y = display.contentCenterY+60
+
+    --button1 = display.newImage("images/menu_button.png")
+    button1 = display.newText(sceneGroup,menuText,0,0,native.systemFontBold,40)
     button1.x = display.contentCenterX -150
     button1.y = display.contentCenterY + 150
     sceneGroup:insert(button1)
     button1:addEventListener("tap",returnToMenu)
 
-    button2 = display.newImage("images/resume_button.png")
-    button2.x = display.contentCenterX + 150
+    --button2 = display.newImage("images/resume_button.png")
+    button2 = display.newText(sceneGroup,resumeText,0,0,native.systemFontBold,40)
+    button2.x = display.contentCenterX + 200
     button2.y = display.contentCenterY + 152
     sceneGroup:insert(button2)
     button2:addEventListener("tap",startGame)

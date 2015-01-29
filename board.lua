@@ -65,7 +65,8 @@ checkGameConditions = function()
     local total = thisGroup.numChildren
     if totalStones[1]==0 then
         moveCompleted=false
-
+        composer.winner = player2Name
+        composer.winCondition = "atsyzkalu"
         for i = 1, total do
             if thisGroup[i]~=nil then 
                 thisGroup[i]:setFillColor(100/255,100/255,100/255)
@@ -76,10 +77,11 @@ checkGameConditions = function()
             time = 500,
             isModal = true
         }
-        composer.showOverlay("pause_menu",options)
+        composer.showOverlay("game_over",options)
     elseif totalStones[2]==0 then
         moveCompleted=false
-
+        composer.winner=player1Name
+        composer.winCondition = "atsyzkalu"
         for i = 1, total do
             if thisGroup[i]~=nil then 
                 thisGroup[i]:setFillColor(100/255,100/255,100/255)
@@ -90,10 +92,11 @@ checkGameConditions = function()
             time = 500,
             isModal = true
         }
-        composer.showOverlay("pause_menu",options)
+        composer.showOverlay("game_over",options)
     elseif tonumber(counterTexts.player1.text)>=82 then
         moveCompleted=false
-
+        composer.winner = player1Name
+        composer.winCondition = "regular win"
         for i = 1, total do
             if thisGroup[i]~=nil then 
                 thisGroup[i]:setFillColor(100/255,100/255,100/255)
@@ -104,10 +107,11 @@ checkGameConditions = function()
             time = 500,
             isModal = true
         }
-        composer.showOverlay("pause_menu",options)
+        composer.showOverlay("game_over",options)
     elseif tonumber(counterTexts.player2.text)>=82 then
         moveCompleted=false
-
+        composer.winner = player2Name
+        composer.winCondition = "regular win"
         for i = 1, total do
             if thisGroup[i]~=nil then 
                 thisGroup[i]:setFillColor(100/255,100/255,100/255)
@@ -118,7 +122,7 @@ checkGameConditions = function()
             time = 500,
             isModal = true
         }
-        composer.showOverlay("pause_menu",options)
+        composer.showOverlay("game_over",options)
     end
 end
 ---------------------------------------------------
@@ -180,7 +184,7 @@ moveToKazan = function()
         --     print("removing stone #"..tekStone)
         -- end
         transition.to(stones[tekStone],{time=1000,x=kazanX,y=kazanY})
-        counterTexts[lastUsedLunka].text = stonesToSteal - 1
+        counterTexts[lastUsedLunka].text = stonesToSteal - i
         counter[lastUsedLunka]=counter[lastUsedLunka]-1
         if startingPlayer==1 then
             counter.player1 = counter.player1 + 1
@@ -193,6 +197,7 @@ moveToKazan = function()
         -- timer.performWithDelay(moveToKazanSpeed,moveToKazan)
     -- else
     end
+    --counterTexts[lastUsedLunka].text = stonesToSteal - 1
     movedToKazan = true
     
          moveCompleted = true
@@ -423,6 +428,7 @@ local function moveBalls()
                 print("last lunka has: "..k, v)
             end
             lastUsedLunka = lastLunka
+            --counterTexts[lastLunka].text = "0"
             timer.performWithDelay(500,moveToKazan)
         else
             movedToKazan=true
