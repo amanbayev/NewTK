@@ -7,6 +7,7 @@ local player1Name = composer.player1Name or "Player 1"
 local player2Name = composer.player2Name or "Player 2"
 local lang = composer.lang or "kz"
 local multiplayer,achievements,leaderboards,gpgs
+local menuItem1,menuItem2
 
 local function startGame(event)
     -- composer.player1Name = "Талгат"
@@ -41,6 +42,7 @@ end
 function scene:create( event )
 
     local sceneGroup = self.view
+    local text1,text2
 
     menuBackground = display.newImage("images/menu_bg.png")
     menuBackground.x = display.contentCenterX
@@ -53,7 +55,40 @@ function scene:create( event )
     gpgs = display.newImage("images/gpgs.png") 
     gpgs.x = 1100
     gpgs.y = 500
+    gpgs:setFillColor(255,0,0,1)
     sceneGroup:insert(gpgs)
+
+    multiplayer = display.newImage("images/multiplayer.png")
+    multiplayer.x = 795
+    multiplayer.y = 500
+    multiplayer:setFillColor(255,0,0,1)
+    sceneGroup:insert(multiplayer)
+
+    achievements = display.newImage("images/achievements.png")
+    achievements.x = 505
+    achievements.y = 500
+    achievements:setFillColor(255,0,0,1)
+    sceneGroup:insert(achievements)
+
+    leaderboards = display.newImage("images/leaderboards.png")
+    leaderboards.x = 245
+    leaderboards.y = 500
+    leaderboards:setFillColor(255,0,0,1)
+    sceneGroup:insert(leaderboards)
+
+    menuItem1 = display.newImage("images/menu_item.png")
+    menuItem1.x = display.contentCenterX
+    menuItem1.y = 200
+    sceneGroup:insert(menuItem1)
+
+    text1 = display.newText(sceneGroup, "1 Player", display.contentCenterX, 200, native.systemFontBold, 30)
+
+    menuItem2 = display.newImage("images/menu_item.png")
+    menuItem2.x = display.contentCenterX
+    menuItem2.y = 280
+    sceneGroup:insert(menuItem2)
+
+    text2 = display.newText(sceneGroup, "2 Players", display.contentCenterX, 280, native.systemFontBold, 30)
 end
 
 
