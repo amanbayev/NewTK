@@ -5,6 +5,16 @@
 
 settings =
 {
+	plugins =
+    {
+        -- key is the name passed to Lua's 'require()'
+		["CoronaProvider.gameNetwork.google"] =
+		{
+			-- required
+			publisherId = "com.coronalabs",
+			supportedPlatforms = { android = true }
+		},
+    },
 	
 	orientation =
 	{
@@ -73,6 +83,7 @@ settings =
 	--
 	android =
 	{
+		googlePlayGamesAppId = "558014537240",
 		usesPermissions =
 		{
 			"android.permission.INTERNET",

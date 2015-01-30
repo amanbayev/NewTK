@@ -4,12 +4,11 @@ local scene = composer.newScene()
 local winCondition = composer.winCondition
 local winner = composer.winner
 local menuBackground
-local button1, button2
+local menuText = composer.menuText
 
-local function startGame(event)
-	composer.hideOverlay("slideUp",400)
-
-end
+local textForGameOver = composer.textForGameOver
+local button1
+local pauseText
 
 local function returnToMenu(event)
     
@@ -25,28 +24,31 @@ end
 function scene:create( event )
 
     local sceneGroup = self.view
-    local ratio
 
-    menuBackground = display.newImage("images/pause_menu.png")
+
+    menuBackground = display.newImage("images/pause_menu_universal.png")
     menuBackground.x = display.contentCenterX
     menuBackground.y = display.contentCenterY
     
     sceneGroup:insert(menuBackground)
 
-    button1 = display.newImage("images/menu_button.png")
+    pauseText = display.newText(sceneGroup,textForGameOver,0,0,native.systemFontBold,40)
+    pauseText.x = display.contentCenterX
+    pauseText.y = display.contentCenterY+60
+    if winCondition=="atsyzkalu" then
+        pauseText.text = pauseText.text .. " " .. composer.atsyzText .. " " .. composer.winner .. " " .. composer.hasWonText
+    elseif winCondition=="draw" then
+        pauseText.text = pauseText.text .. " " .. composer.drawText
+    else
+        pauseText.text = pauseText.text .. " " .. composer.winner .. " " .. composer.hasWonText
+    end
+
+    --button1 = display.newImage("images/menu_button.png")
+    button1 = display.newText(sceneGroup,menuText,0,0,native.systemFontBold,40)
     button1.x = display.contentCenterX -150
     button1.y = display.contentCenterY + 150
     sceneGroup:insert(button1)
     button1:addEventListener("tap",returnToMenu)
-
-    button2 = display.newImage("images/resume_button.png")
-    button2.x = display.contentCenterX + 150
-    button2.y = display.contentCenterY + 152
-    sceneGroup:insert(button2)
-    button2:addEventListener("tap",startGame)
-
-    --menuBackground:addEventListener("tap",startGame)
-    --timer.performWithDelay(2000,startGame)
 end
 
 

@@ -770,7 +770,7 @@ function scene:hide( event )
         -- Insert code here to "pause" the scene.
         -- Example: stop timers, stop animation, stop audio, etc.
     elseif ( phase == "did" ) then
-        composer.removeScene("board")
+        composer.removeScene("boardSingle")
         -- Called immediately after scene goes off screen.
     end
 end
