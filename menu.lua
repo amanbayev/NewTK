@@ -11,7 +11,7 @@ local alias
 
 local menuBackground
 local playerAlias = ""
-local lang = composer.lang or "kz"
+local lang = composer.lang or "ru"
 local multiplayer,achievements,leaderboards,gpgs
 local menuItem1,menuItem2
 local flags = {}
@@ -170,7 +170,7 @@ function scene:create( event )
     menuItem1.id = 1
     menuItem1:addEventListener("tap",startGame)
 
-    text1 = display.newText(sceneGroup, "1 Player", display.contentCenterX, 400, native.systemFontBold, 30)
+    text1 = display.newText(sceneGroup, "1 Игрок", display.contentCenterX, 400, native.systemFontBold, 30)
 
     menuItem2 = display.newImage("images/menu_item.png")
     menuItem2.x = display.contentCenterX
@@ -179,7 +179,7 @@ function scene:create( event )
     sceneGroup:insert(menuItem2)
     menuItem2:addEventListener("tap",startGame)
 
-    text2 = display.newText(sceneGroup, "2 Players", display.contentCenterX, 480, native.systemFontBold, 30)
+    text2 = display.newText(sceneGroup, "2 Игрока", display.contentCenterX, 480, native.systemFontBold, 30)
 
     for i=1,3 do
         flags[i] = display.newImage("images/"..flag_images[i]..".png")
