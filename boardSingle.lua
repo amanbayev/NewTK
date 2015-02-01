@@ -67,7 +67,7 @@ checkGameConditions = function()
 
     print(tostring(p1turn).." is p1turn")
     print(totalStones[1].." is total stones 1")
-    if (totalStones[1]==0) and  p1turn then
+    if (totalStones[1]==0) and p1turn then
         moveCompleted=false
 
         composer.winner = player2Name
@@ -100,7 +100,7 @@ checkGameConditions = function()
         composer.showOverlay("game_over",options)
     elseif tonumber(counterTexts.player1.text)>=82 then
         moveCompleted=false
-        composer.winner = player1Name
+        composer.winner = player2Name
         composer.winCondition = "regular win"
         for i = 1, total do
             if thisGroup[i]~=nil then 
@@ -115,7 +115,7 @@ checkGameConditions = function()
         composer.showOverlay("game_over",options)
     elseif tonumber(counterTexts.player2.text)>=82 then
         moveCompleted=false
-        composer.winner = player2Name
+        composer.winner = player1Name
         composer.winCondition = "regular win"
         for i = 1, total do
             if thisGroup[i]~=nil then 
@@ -295,11 +295,11 @@ moveShar = function(origin,dest,sharId)
                 time = 0
             end
             if origin>9 and dest<10 then
-                totalStones[1]=totalStones[1]-1
-                totalStones[2]=totalStones[2]+1
-            elseif origin>0 and origin<10 and dest>9 then
-                totalStones[1]=totalStones[1]+1
                 totalStones[2]=totalStones[2]-1
+                totalStones[1]=totalStones[1]+1
+            elseif origin>0 and origin<10 and dest>9 then
+                totalStones[2]=totalStones[2]+1
+                totalStones[1]=totalStones[1]-1
             elseif origin==0 then
                 if dest<10 then
                     totalStones[1]=totalStones[1]+1
@@ -307,8 +307,8 @@ moveShar = function(origin,dest,sharId)
                     totalStones[2]=totalStones[2]+1
                 end
             end
-            --print("totalstones 1 = "..totalStones[1])
-            --print("totalstones 2 = "..totalStones[2])
+            print("totalstones 1 = "..totalStones[1])
+            print("totalstones 2 = "..totalStones[2])
 			transition.to(stones[sharId],{time,x=ballX, y=ballY})
             if origin > 0 then
                 counter[origin]=#LK[origin]
