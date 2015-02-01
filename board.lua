@@ -67,7 +67,7 @@ checkGameConditions = function()
 
     print(tostring(p1turn).." is p1turn")
     print(totalStones[1].." is total stones 1")
-    if (totalStones[1]==0) and  p1turn then
+    if (totalStones[1]==0) and p1turn then
         moveCompleted=false
 
         composer.winner = player2Name
@@ -100,7 +100,7 @@ checkGameConditions = function()
         composer.showOverlay("game_over",options)
     elseif tonumber(counterTexts.player1.text)>=82 then
         moveCompleted=false
-        composer.winner = player1Name
+        composer.winner = player2Name
         composer.winCondition = "regular win"
         for i = 1, total do
             if thisGroup[i]~=nil then 
@@ -115,7 +115,7 @@ checkGameConditions = function()
         composer.showOverlay("game_over",options)
     elseif tonumber(counterTexts.player2.text)>=82 then
         moveCompleted=false
-        composer.winner = player2Name
+        composer.winner = player1Name
         composer.winCondition = "regular win"
         for i = 1, total do
             if thisGroup[i]~=nil then 
@@ -146,39 +146,27 @@ checkGameConditions = function()
     end
 end
 ---------------------------------------------------
-moveToKazan = function()
+moveToKazan = function(playerId)
     local stonesToSteal = tonumber(counterTexts[lastUsedLunka].text)
     local tekStone
     local kazanX, kazanY, rowY, rowX, kazanPos
     local stonesInKazan
     local shifted = false
     local modX = 0
-    local StPl = startingPlayer
     --print("kazan last lunka "..lastUsedLunka)
     --print("trying to steal to kazan "..stonesToSteal)
     rowY = 0
-    if not forTuzdyk then
-        if p1turn then StPl=2 else StPl =1 end
-    else
-        if not kazan1collected then kazan1collected=true
-            elseif not kazan2collected then kazan2collected=true end
-    end
+    rowX = 0
+    modX = 0
     for i=1, stonesToSteal do
-        rowY = 0
-        modX = 0
-        rowX = 0
-        --print("still stealing, now we have to steal "..stonesToSteal-i.." more stones from lunka "..lastUsedLunka)
-        totalStones[StPl]=totalStones[StPl]-1
-        --print("totalStones 1 = "..totalStones[1])
-        --print("totalStones 2 = "..totalStones[2])
-        if StPl==1 then 
+        totalStones[3-playerId]=totalStones[3-playerId]-1
+
+        if playerId==1 then 
             kazanY = display.contentCenterY - 80
             stonesInKazan = counter.player1
-        elseif StPl==2 then 
+        elseif playerId==2 then 
             kazanY = display.contentCenterY + 80
-            --stonesInKazan = counter.player2
             stonesInKazan = counter.player2
-
         end
 
         kazanX = 170
@@ -199,8 +187,9 @@ moveToKazan = function()
             --print(modX.." is modX after 30")
         else
             rowX = stonesInKazan*33
+            rowY = 0
         end
-        if startingPlayer==2 then
+        if playerId==2 then
             rowY = -rowY
         end
         kazanX = rowX + kazanX + modX
@@ -213,35 +202,37 @@ moveToKazan = function()
         -- else
         --     print("removing stone #"..tekStone)
         -- end
-        transition.to(stones[tekStone],{time=1000,x=kazanX,y=kazanY})
+        transition.to( 
+                       stones[tekStone], 
+                       { 
+                            time=1000, 
+                            x=kazanX, 
+                            y=kazanY 
+                       }
+                      )
         counterTexts[lastUsedLunka].text = stonesToSteal - i
         counter[lastUsedLunka]=counter[lastUsedLunka]-1
-        if not p1turn then
+        if playerId==1 then
             counter.player1 = counter.player1 + 1
             counterTexts.player1.text = counter.player1
         else
             counter.player2 = counter.player2 + 1
             counterTexts.player2.text = counter.player2
         end
-
-        -- timer.performWithDelay(moveToKazanSpeed,moveToKazan)
-    -- else
     end
-    --counterTexts[lastUsedLunka].text = stonesToSteal - 1
+    
     movedToKazan = true
-    
     moveCompleted = true
-    
     checkGameConditions()
 
-        if  p1turn then 
-            cPlayerName = player2Name
-            statusText.rotation=180
-        else
-            cPlayerName = player1Name
-            statusText.rotation=0
-        end
-        statusText.text = cPlayerName .. " "  .. turnText
+    -- if  p1turn then 
+    --     cPlayerName = player2Name
+    --     statusText.rotation=180
+    -- else
+    --     cPlayerName = player1Name
+    --     statusText.rotation=0
+    -- end
+    -- statusText.text = cPlayerName .. " "  .. turnText    
 end
 ----------------------------------------------------
 moveShar = function(origin,dest,sharId)
@@ -304,11 +295,11 @@ moveShar = function(origin,dest,sharId)
                 time = 0
             end
             if origin>9 and dest<10 then
-                totalStones[1]=totalStones[1]-1
-                totalStones[2]=totalStones[2]+1
-            elseif origin>0 and origin<10 and dest>9 then
-                totalStones[1]=totalStones[1]+1
                 totalStones[2]=totalStones[2]-1
+                totalStones[1]=totalStones[1]+1
+            elseif origin>0 and origin<10 and dest>9 then
+                totalStones[2]=totalStones[2]+1
+                totalStones[1]=totalStones[1]-1
             elseif origin==0 then
                 if dest<10 then
                     totalStones[1]=totalStones[1]+1
@@ -316,8 +307,8 @@ moveShar = function(origin,dest,sharId)
                     totalStones[2]=totalStones[2]+1
                 end
             end
-            --print("totalstones 1 = "..totalStones[1])
-            --print("totalstones 2 = "..totalStones[2])
+            print("totalstones 1 = "..totalStones[1])
+            print("totalstones 2 = "..totalStones[2])
 			transition.to(stones[sharId],{time,x=ballX, y=ballY})
             if origin > 0 then
                 counter[origin]=#LK[origin]
@@ -326,15 +317,28 @@ moveShar = function(origin,dest,sharId)
             counter[dest]=#LK[dest]
             counterTexts[dest].text = counter[dest]
 end
-
+----------------------------------------------------
 local function onKeyEvent(event)
-    if (event.keyName == "back") then
-        local platformName = system.getInfo( "platformName" )
-        if ( platformName == "Android" ) then
-            composer.gotoScene( "menu")
-            return false
+    -- if (event.keyName == "back") then
+    --     -- local platformName = system.getInfo( "platformName" )
+    --     -- if ( platformName == "Android" ) then
+    --     --     composer.gotoScene( "menu")
+    --     --     return false
+    --     -- end
+        local total = thisGroup.numChildren
+        for i = 1, total do
+            if thisGroup[i]~=nil then 
+                thisGroup[i]:setFillColor(100/255,100/255,100/255)
+            end
         end
-    end
+        --print("pausing")
+        local options = {
+            effect = "slideDown",
+            time = 500,
+            isModal = true
+        }
+        composer.showOverlay("pause_menu",options)
+    -- end
 
     -- IMPORTANT! Return false to indicate that this app is NOT overriding the received key
     -- This lets the operating system execute its default handling of the key
@@ -384,11 +388,11 @@ end
 
 local function collectTuzdyk2()
     --print("collecting 2")
-    startingPlayer=2
+    
     lastUsedLunka=tuzdyks[2]
     forTuzdyk = true
-    moveToKazan()
-    forTuzdyk = false
+    moveToKazan(2)
+    -- forTuzdyk = false
     print(tostring(p1turn))
     
     checkGameConditions()
@@ -405,23 +409,19 @@ end
 
 local function collectTuzdyk1()
     --print("collecting 1")
-    startingPlayer=1
     lastUsedLunka=tuzdyks[1]
-    movedToKazan = false
-    forTuzdyk = true
-    moveToKazan()
-    forTuzdyk = false
-    
+    movedToKazan = false 
+    moveToKazan(1)
+    kazan1collected = true
         if tuzdyks[2]>0 then
             movedToKazan = false
-            startingPlayer=2
             lastUsedLunka=tuzdyks[2]
             timer.performWithDelay(210,collectTuzdyk2)
         else
             kazan2collected =true
             lastUsedLunka = lastLunka
             checkGameConditions()
-            print(tostring(p1turn))
+            --print(tostring(p1turn))
             if  p1turn then 
                 cPlayerName = player2Name
                 statusText.rotation=180
@@ -432,6 +432,10 @@ local function collectTuzdyk1()
             statusText.text = cPlayerName .. " "  .. turnText
         end
 
+end
+
+local function driverForKazan()
+    moveToKazan(startingPlayer)
 end
 
 local function moveBalls()
@@ -459,7 +463,7 @@ local function moveBalls()
             -- end
             lastUsedLunka = lastLunka
             --counterTexts[lastLunka].text = "0"
-            timer.performWithDelay(800,moveToKazan)
+            timer.performWithDelay(800,driverForKazan)
         else
             movedToKazan=true
         end
@@ -479,7 +483,7 @@ local function moveBalls()
                     lunkas[lastLunka].id = lastLunka
                     thisGroup:insert(2,lunkas[lastLunka])
                     lastUsedLunka = lastLunka
-                    -- performwithDelay(1100,moveToKazan)
+                    
                 elseif startingPlayer==1 and (tuzdyks[2]~=lastLunka-9) then
                     --print("tuzdyk for player "..startingPlayer.." at lunka #"..lastLunka)
                     tuzdyks[startingPlayer] = lastLunka
@@ -491,22 +495,18 @@ local function moveBalls()
                     lunkas[lastLunka].id = lastLunka
                     thisGroup:insert(2,lunkas[lastLunka])
                     lastUsedLunka = lastLunka
-                    -- moveToKazan()
+                    
                 end
-                --moveToKazan()
+
             end
         end
         if (tuzdyks[1]~=0) and (counter[tuzdyks[1]] ~= 0) then
-            -- startingPlayer=1
-            -- lastUsedLunka=tuzdyks[1]
             movedToKazan = false
             moveCompleted = false
             statusText.text = collectingTuzdykText
             timer.performWithDelay(800,collectTuzdyk1)
         elseif tuzdyks[2]~=0 and (counter[tuzdyks[2]] ~= 0) then
             kazan1collected = true
-            -- startingPlayer=2
-            -- lastUsedLunka=tuzdyks[2]
             statusText.text = collectingTuzdykText
             movedToKazan = false
             moveCompleted = false
@@ -514,7 +514,6 @@ local function moveBalls()
         else
             kazan1collected=true
             kazan2collected=true
-            --print("i'm here")
             if movedToKazan then
                 if  p1turn then 
                     cPlayerName = player2Name
@@ -528,7 +527,6 @@ local function moveBalls()
                 checkGameConditions()
             end
         end
-        --moveCompleted=true
         ballsMoved = true
 	else
 		countMoves = countMoves + 1
@@ -770,7 +768,7 @@ function scene:hide( event )
         -- Insert code here to "pause" the scene.
         -- Example: stop timers, stop animation, stop audio, etc.
     elseif ( phase == "did" ) then
-        composer.removeScene("board")
+        composer.removeScene("boardSingle")
         -- Called immediately after scene goes off screen.
     end
 end
