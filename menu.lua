@@ -5,6 +5,7 @@ local scene = composer.newScene()
 composer.gameNetwork = require( "gameNetwork" )
 local gpgsInitCallback
 local requestLoginCallback
+local onIOS = false
 
 local playerID
 local alias
@@ -214,13 +215,14 @@ function scene:show( event )
     local phase = event.phase
 
     if ( phase == "will" ) then
-        -- if ( system.getInfo("platformName") == "Android" ) then
+        if ( system.getInfo("platformName") == "Android" ) then
             -- google game play services
             composer.gameNetwork.init( "google", gpgsInitCallback )
-        -- else
-        --     -- apple game center
-        --     composer.gameNetwork.init( "gamecenter", gameNetworkLoginCallback )
-        -- end
+        else
+            -- apple game center
+            onIOS = true
+            composer.gameNetwork.init( "gamecenter", gameNetworkLoginCallback )
+        end
         -- Called when the scene is still off screen (but is about to come on screen).
     elseif ( phase == "did" ) then
         -- Called when the scene is now on screen.
