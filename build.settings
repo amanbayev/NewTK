@@ -14,6 +14,11 @@ settings =
 			publisherId = "com.coronalabs",
 			supportedPlatforms = { android = true }
 		},
+		["CoronaProvider.gameNetwork.apple"] =
+        {
+            publisherId = "com.coronalabs",
+            supportedPlatforms = { iphone=true, ["iphone-sim"]=true },
+        },
     },
 	
 	orientation =
@@ -39,9 +44,9 @@ settings =
 	{
 		plist =
 		{
-			UIStatusBarHidden = false,
-			UIPrerenderedIcon = true, -- set to false for "shine" overlay
-			--UIApplicationExitsOnSuspend = true, -- uncomment to quit app on suspend
+			UIStatusBarHidden = true,
+			UIPrerenderedIcon = false, -- set to false for "shine" overlay
+			UIApplicationExitsOnSuspend = true, -- uncomment to quit app on suspend
 
 			CFBundleIconFiles =
 			{
@@ -62,7 +67,7 @@ settings =
 				"Icon-Small-50.png",
 				"Icon-Small-50@2x.png",
 			},
-
+			CFBundleIdentifier = "com.growit.TogyzKumalak",	-- Apple's GameCenter Example (GKTapper)
 			--[[
 			-- iOS app URL schemes:
 			CFBundleURLTypes =
