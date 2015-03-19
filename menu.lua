@@ -11,6 +11,7 @@ local playerID
 local alias
 
 local menuBackground
+local info_button
 local playerAlias = ""
 local lang = composer.lang or "ru"
 local multiplayer,achievements,leaderboards,gpgs
@@ -20,6 +21,7 @@ local flag_images = {"kz","ru","en"}
 local text1,text2
 
 local changeLang
+local showInfo
 
 local function startGame(event)
     -- composer.player1Name = "Талгат"
@@ -78,13 +80,77 @@ local function startGame(event)
     end
 end
 
+
+local function requestLoadPlayersCallback(event)
+    composer.otherPlayerAlias = event.data.alias
+end
+
+local function beginGame(playerId, roomID)
+    Runtime:removeEventListener( "key", onKeyEvent );
+    local options =
+    {
+        effect = "fade",
+        time = 400
+    }
+    gameNetwork.request( "loadPlayers",
+    {
+        playerIDs =
+        {
+            playerId
+        },
+        listener = requestLoadPlayersCallback
+    })
+    composer.otherPlayerId = playerId
+    composer.matchId = roomID
+
+    composer.gotoScene( "boardSingle", options )
+end
+
+local function waitingRoomListener(waitingRoomEvent)
+    if waitingRoomEvent.data.phase == "start" then
+        -- We only need the first player because its a 2 player game
+        beginGame(waitingRoomEvent.data[1], waitingRoomEvent.data.roomID) 
+    end
+end
+
+local function roomListener(event)
+    if event.type == "joinRoom" or event.type == "createRoom" then
+        if event.data.isError then 
+            native.showAlert("Room Error", "Sorry there was an error when trying to create/join a room")
+        else
+            composer.gameNetwork.show("waitingRoom", {
+                listener = waitingRoomListener,
+                roomID = event.data.roomID,
+                minPlayers = 0
+            })
+        end
+    end
+end
+
+local function buttonTap(event)
+    local function selectPlayersListener(selectPlayerEvent)
+                        -- Create a room with only the first selection
+        local array = {selectPlayerEvent.data[1]}
+        composer.gameNetwork.request("createRoom", {
+                listener = roomListener,
+                playerIDs = array
+            })
+    end
+    composer.gameNetwork.show("selectPlayers", {
+        listener = selectPlayersListener,
+        minPlayers = 1,
+        maxPlayers = 1
+    })
+    composer.isHost = 1
+end
+
 local function requestLoadLocalPlayerCallback (event)
     playerID = event.data.playerID
     alias = event.data.alias
 
     composer.playerID=playerID
     composer.alias=alias
-    --drawWelcomeScreen()
+
 end
 
 requestLoginCallback = function(event)
@@ -182,6 +248,14 @@ function scene:create( event )
 
     text2 = display.newText(sceneGroup, "2 Игрока", display.contentCenterX, 480, native.systemFontBold, 30)
 
+    info_button = display.newImage("images/info_button.png")
+    info_button.x = 100
+    info_button.y = 500
+    info_button.width = 100
+    info_button.height = 100
+    sceneGroup:insert(info_button)
+    info_button:addEventListener("tap",showInfo)
+
     for i=1,3 do
         flags[i] = display.newImage("images/"..flag_images[i]..".png")
         flags[i].x = 100
@@ -189,6 +263,17 @@ function scene:create( event )
         flags[i].id = flag_images[i]
         sceneGroup:insert(flags[i])
         flags[i]:addEventListener("tap",changeLang)
+    end
+end
+
+showInfo = function (event)
+    composer.gotoScene("show_rules")
+    if composer.lang=="ru" then
+
+    elseif composer.lang=="kz" then
+
+    elseif composer.lang=="en" then
+
     end
 end
 

@@ -20,6 +20,7 @@ application =
 	-- Push notifications
 	notification =
 	{
+		google = { projectNumber = "558014537240", },
 		iphone =
 		{
 			types =
